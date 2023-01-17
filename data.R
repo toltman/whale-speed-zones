@@ -32,3 +32,31 @@ east_coast = c(
 )
 
 states <- states %>% filter(NAME %in% east_coast)
+
+dma <- readxl::read_excel(here::here(
+  "data",
+  "DMA coordinates",
+  "2021 DMA-Slow Zones.xlsx"
+))
+
+dma <- dma %>%
+  separate(
+    Boundaries, 
+    c("lat_degree_A", "lat_min_A",
+      "lat_degree_B", "lat_min_B",
+      "lon_degree_A", "lon_min_A",
+      "lon_degree_B", "lon_min_B"
+    ),
+    sep = "\\D+",
+    remove = FALSE,
+    convert = TRUE
+  ) %>% 
+  mutate(
+    latA = lat_degree_A + lat_min_A / 60, 
+    latB = lat_degree_B + lat_min_B / 60,
+    lonA = lon_degree_B + lat_min_B / 60,
+    lonB = lon_degree_B + lon_min_B / 60
+  )
+
+
+dma <- st_as_sf(dma %>% filter(!is.na(latA)), coords = c("latA", "lonA", "latB", "lonB"))

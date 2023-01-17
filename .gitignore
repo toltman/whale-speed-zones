@@ -3,3 +3,4 @@ data/
 *.png
 *.Rproj.*
 .Rhistory
+.Rproj.user
