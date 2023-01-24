@@ -37,9 +37,7 @@ dma <- readxl::read_excel(here::here(
   "data",
   "DMA coordinates",
   "2021 DMA-Slow Zones.xlsx"
-))
-
-dma <- dma %>%
+)) %>%
   separate(
     Boundaries, 
     c("lat_degree_A", "lat_min_A",
@@ -56,7 +54,28 @@ dma <- dma %>%
     latB = lat_degree_B + lat_min_B / 60,
     lonA = lon_degree_B + lat_min_B / 60,
     lonB = lon_degree_B + lon_min_B / 60
+  ) %>%
+  select(-c(6:13))
+
+create_poly <- function(a, b, c, d) {
+  rbind(c(a, c), c(a, d), c(b, d), c(b, c), c(a, c)) %>%
+    list %>%
+    st_polygon %>%
+    st_as_text
+}
+
+dma <- dma %>% 
+  filter(!is.na(latA)) %>%
+  mutate(
+    geometry = mapply(
+      create_poly,
+      -lonA,
+      -lonB,
+      latA,
+      latB
+    )
   )
 
 
-dma <- st_as_sf(dma %>% filter(!is.na(latA)), coords = c("latA", "lonA", "latB", "lonB"))
+dma$geometry <- st_as_sfc(dma$geometry, crs = 4326)
+dma <- st_sf(dma)

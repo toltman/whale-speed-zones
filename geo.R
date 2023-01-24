@@ -1,7 +1,5 @@
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 library(sf)
-library(ggplot2)
 
 theme_set(theme_bw())
 
@@ -14,6 +12,7 @@ lat_bounds <- c(bbox$ymin, bbox$ymax)
 ggplot() +
   geom_sf(data = ssz, aes(fill = ssz)) +
   geom_sf(data = states) +
+  geom_sf(data = dma %>% select("General Location") %>% filter(`General Location` == "South of Nantucket Island"), fill = "steelblue", alpha = 0.5) +
   coord_sf(xlim = lon_bounds, ylim = lat_bounds)
 
 
