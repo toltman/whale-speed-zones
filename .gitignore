@@ -1,7 +1,9 @@
 .DS_Store
-data/
-*.png
 *.Rproj.*
 .Rhistory
 .Rproj.user
 *.Rproj
+*.RData
+
+*.png
+data/
