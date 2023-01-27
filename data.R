@@ -33,13 +33,35 @@ east_coast = c(
 
 states <- states %>% filter(NAME %in% east_coast)
 
-dma <- readxl::read_excel(here::here(
+dma_2020 <- readxl::read_excel(here::here(
+  "data",
+  "DMA coordinates",
+  "2020 DMA-Slow Zones.xlsx"
+))
+
+dma_2021 <- readxl::read_excel(here::here(
   "data",
   "DMA coordinates",
   "2021 DMA-Slow Zones.xlsx"
-)) %>%
+)) %>% 
+  mutate(type = "None", .before = 2)
+
+dma_2022 <- readxl::read_excel(here::here(
+  "data",
+  "DMA coordinates",
+  "2022 DMA-Slow Zones.xlsx"
+))
+
+col_names <- c("date", "type", "number", "source", "location", "boundaries")
+colnames(dma_2020) <- col_names
+colnames(dma_2021) <- col_names
+colnames(dma_2022) <- col_names
+
+dma <- rbind(dma_2020, dma_2021, dma_2022)
+
+dma <- dma %>%
   separate(
-    Boundaries, 
+    boundaries, 
     c("lat_degree_A", "lat_min_A",
       "lat_degree_B", "lat_min_B",
       "lon_degree_A", "lon_min_A",
@@ -47,15 +69,15 @@ dma <- readxl::read_excel(here::here(
     ),
     sep = "\\D+",
     remove = FALSE,
-    convert = TRUE
+    convert = TRUE,
+    extra = "drop"
   ) %>% 
   mutate(
     latA = lat_degree_A + lat_min_A / 60, 
     latB = lat_degree_B + lat_min_B / 60,
-    lonA = lon_degree_B + lat_min_B / 60,
+    lonA = lon_degree_A + lon_min_A / 60,
     lonB = lon_degree_B + lon_min_B / 60
-  ) %>%
-  select(-c(6:13))
+  )
 
 create_poly <- function(a, b, c, d) {
   rbind(c(a, c), c(a, d), c(b, d), c(b, c), c(a, c)) %>%

@@ -12,7 +12,7 @@ lat_bounds <- c(bbox$ymin, bbox$ymax)
 ggplot() +
   geom_sf(data = ssz, aes(fill = ssz)) +
   geom_sf(data = states) +
-  geom_sf(data = dma %>% select("General Location") %>% filter(`General Location` == "South of Nantucket Island"), fill = "steelblue", alpha = 0.5) +
+  geom_sf(data = dma , fill = "steelblue", alpha = 0.25) +
   coord_sf(xlim = lon_bounds, ylim = lat_bounds)
 
 
